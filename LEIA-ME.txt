@@ -1,0 +1,38 @@
+LABORATÓRIO DE EQUALIZAÇÃO DO YOUTUBE — TESTE LOCAL
+
+O que está incluído
+- index.html / app.js: mini site com campo de link, player incorporado e seis faders.
+- extensao/: extensão Chrome Manifest V3 que captura o áudio da aba e o processa com Web Audio API.
+
+IMPORTANTE
+A captura é feita pela extensão Chrome, não pelo JavaScript da página. O Chrome exige uma ação explícita do usuário para iniciar tabCapture.
+A captura processa TODO o áudio da aba. Use uma aba dedicada ao teste, sem outras fontes de som.
+O YouTube precisa permitir a reprodução incorporada do vídeo escolhido.
+
+COMO TESTAR
+1. Extraia a pasta do ZIP.
+2. Abra o Chrome e acesse chrome://extensions
+3. Ative "Modo do desenvolvedor".
+4. Clique em "Carregar sem compactação" e selecione a pasta "extensao".
+5. Sirva a pasta do mini site por um servidor local. Exemplo, se tiver Python instalado:
+   - Abra o terminal dentro da pasta que contém index.html
+   - Execute: python -m http.server 8000
+   - Abra: http://localhost:8000
+   Também pode hospedar os arquivos em GitHub Pages.
+6. Cole um link de vídeo do YouTube e clique em Carregar.
+7. Clique no ícone da extensão Retro EQ e depois em "Iniciar captura desta aba".
+8. Volte à página, dê play no vídeo e mova os faders.
+9. Clique em "Parar captura" no popup da extensão para encerrar.
+
+NOTAS TÉCNICAS
+- O player incorporado continua sendo um iframe; a extensão captura o áudio final da aba, sem tentar ler o conteúdo interno do iframe.
+- A captura da aba substitui a saída direta pelo caminho de processamento. O áudio processado é encaminhado novamente aos alto-falantes.
+- Os seis filtros são peaking em 60, 150, 400, 1000, 3000 e 10000 Hz, com faixa de -12 a +12 dB.
+- O ganho de saída foi reduzido para 0,85 para oferecer alguma margem contra clipping.
+- O content script está configurado para localhost, 127.0.0.1 e domínios *.github.io. Se hospedar em outro domínio, acrescente o domínio em host_permissions e matches no manifest.json.
+- Para alterações no código da extensão, volte a chrome://extensions e clique em Recarregar na extensão.
+
+LIMITAÇÕES
+- Não é um bloqueador de anúncios. Anúncios e outros sons da aba também serão capturados e equalizados.
+- Alguns vídeos podem impedir reprodução incorporada.
+- O Chrome pode exigir que você inicie a captura novamente após recarregar a aba ou a extensão.

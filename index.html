@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Laboratório — Equalizador YouTube</title>
+<style>
+:root{color-scheme:dark;--bg:#11151a;--panel:#1b222a;--line:#39434e;--accent:#d79b42;--muted:#9eabb8}
+*{box-sizing:border-box}body{margin:0;background:radial-gradient(circle at top,#26313b,#101419 65%);color:#edf2f6;font:15px system-ui,Segoe UI,sans-serif;padding:28px}
+main{max-width:900px;margin:auto}.panel{background:#1b222a;border:1px solid var(--line);border-radius:16px;padding:22px;margin:16px 0;box-shadow:0 12px 30px #0005}
+h1{font-size:25px;margin:0 0 6px}.sub,.hint{color:var(--muted)}.urlrow{display:flex;gap:10px;margin-top:18px}
+input[type=url]{flex:1;min-width:0;background:#0e1318;color:white;border:1px solid var(--line);padding:13px;border-radius:9px}
+button{background:var(--accent);color:#17120b;border:0;border-radius:9px;padding:12px 17px;font-weight:750;cursor:pointer}button.secondary{background:#34414e;color:#fff}
+#playerWrap{display:flex;justify-content:center;margin-top:16px}iframe{width:min(100%,560px);aspect-ratio:16/9;border:0;border-radius:10px;background:#080b0e}
+.eq{display:grid;grid-template-columns:repeat(6,1fr);gap:14px;margin-top:18px}
+.band{background:#11171d;border:1px solid #303a44;border-radius:12px;padding:15px 8px;text-align:center}
+.band strong{display:block;font-size:14px}.db{font-variant-numeric:tabular-nums;color:#f1c47d;margin:7px 0}
+input[type=range]{writing-mode:vertical-lr;direction:rtl;appearance:slider-vertical;width:30px;height:165px;accent-color:var(--accent);cursor:pointer}
+.status{display:flex;align-items:center;gap:9px}.dot{width:10px;height:10px;border-radius:50%;background:#697581}.dot.on{background:#42c77a;box-shadow:0 0 12px #42c77a}
+.note{font-size:13px;line-height:1.5;color:var(--muted)}.actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px}
+@media(max-width:600px){body{padding:12px}.eq{gap:5px}.band{padding:10px 2px}.band strong{font-size:11px}input[type=range]{height:145px}.panel{padding:15px}}
+</style>
+</head>
+<body>
+<main>
+  <section class="panel">
+    <h1>Laboratório de áudio</h1>
+    <div class="sub">Teste de equalização real do áudio da aba do Chrome</div>
+    <div class="urlrow">
+      <input id="youtubeUrl" type="url" placeholder="Cole aqui um link do YouTube (youtube.com ou youtu.be)">
+      <button id="loadBtn">Carregar</button>
+    </div>
+    <div id="playerWrap"><div class="hint">O player aparecerá aqui depois de carregar um link.</div></div>
+    <div class="note">Para começar: carregue o vídeo, clique no ícone da extensão do Chrome e pressione “Iniciar captura”. Depois reproduza o vídeo. O player fica visível para este teste.</div>
+  </section>
+
+  <section class="panel">
+    <div class="status"><span id="dot" class="dot"></span><strong id="captureStatus">Captura não iniciada</strong></div>
+    <p class="note">A captura é iniciada pelo botão da extensão, por exigência de segurança do Chrome. Ela processa o áudio inteiro desta aba.</p>
+    <div class="actions">
+      <button class="secondary" id="flatBtn">Zerar equalizador</button>
+    </div>
+    <div class="eq" id="equalizer">
+      <div class="band"><strong>60 Hz</strong><div class="db">0.0 dB</div><input aria-label="60 Hz" type="range" min="-12" max="12" step="0.5" value="0" data-band="0"></div>
+      <div class="band"><strong>150 Hz</strong><div class="db">0.0 dB</div><input aria-label="150 Hz" type="range" min="-12" max="12" step="0.5" value="0" data-band="1"></div>
+      <div class="band"><strong>400 Hz</strong><div class="db">0.0 dB</div><input aria-label="400 Hz" type="range" min="-12" max="12" step="0.5" value="0" data-band="2"></div>
+      <div class="band"><strong>1 kHz</strong><div class="db">0.0 dB</div><input aria-label="1 kHz" type="range" min="-12" max="12" step="0.5" value="0" data-band="3"></div>
+      <div class="band"><strong>3 kHz</strong><div class="db">0.0 dB</div><input aria-label="3 kHz" type="range" min="-12" max="12" step="0.5" value="0" data-band="4"></div>
+      <div class="band"><strong>10 kHz</strong><div class="db">0.0 dB</div><input aria-label="10 kHz" type="range" min="-12" max="12" step="0.5" value="0" data-band="5"></div>
+    </div>
+  </section>
+  <p class="note">Observação: este protótipo usa filtros peaking de seis bandas. Como a captura é da aba, notificações e outros sons reproduzidos nela também passam pelo equalizador.</p>
+</main>
+<script src="app.js"></script>
+</body>
+</html>
