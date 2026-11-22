@@ -1,0 +1,148 @@
+
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Teste automático — Pular anúncio</title>
+<style>
+body {
+  margin: 0;
+  padding: 25px;
+  background: #151a20;
+  color: #eee;
+  font: 15px Arial, sans-serif;
+}
+main { max-width: 850px; margin: auto; }
+h1 { color: #e6ad55; }
+input {
+  padding: 12px;
+  width: 70%;
+  background: #252e38;
+  color: white;
+  border: 1px solid #536171;
+  border-radius: 6px;
+}
+button {
+  padding: 12px 18px;
+  cursor: pointer;
+  border: 0;
+  border-radius: 6px;
+  background: #d99c42;
+  font-weight: bold;
+}
+#player {
+  margin-top: 20px;
+  aspect-ratio: 16/9;
+  background: #080b0e;
+}
+iframe { width: 100%; height: 100%; border: 0; }
+#status {
+  margin-top: 20px;
+  padding: 15px;
+  background: #252e38;
+  border-radius: 8px;
+}
+#log {
+  height: 180px;
+  overflow-y: auto;
+  background: #0c1015;
+  padding: 12px;
+  margin-top: 12px;
+  font: 13px monospace;
+  color: #a9d8b0;
+}
+</style>
+</head>
+<body>
+<main>
+  <h1>TESTE — AUTO SKIP</h1>
+  <p>Detector automático de anúncios do YouTube</p>
+
+  <input id="link" placeholder="Cole o link do YouTube">
+  <button id="load">CARREGAR VÍDEO</button>
+
+  <div id="player">
+    <p style="text-align:center;padding:30px">
+      Aguardando vídeo...
+    </p>
+  </div>
+
+  <div id="status">
+    <strong>Monitoramento:</strong>
+    <span id="state">Aguardando vídeo</span>
+  </div>
+
+  <h3>Registro de eventos</h3>
+  <div id="log"></div>
+</main>
+
+<script>
+const link = document.getElementById("link");
+const player = document.getElementById("player");
+const log = document.getElementById("log");
+const state = document.getElementById("state");
+
+function register(message) {
+  const time = new Date().toLocaleTimeString();
+  log.innerHTML += `[${time}] ${message}<br>`;
+  log.scrollTop = log.scrollHeight;
+}
+
+function getVideoId(value) {
+  try {
+    const url = new URL(value);
+    let id = "";
+
+    if (url.hostname === "youtu.be") {
+      id = url.pathname.split("/")[1];
+    } else if (url.hostname.includes("youtube.com")) {
+      if (url.pathname === "/watch") {
+        id = url.searchParams.get("v");
+      } else if (/^\/(embed|shorts|live)\//.test(url.pathname)) {
+        id = url.pathname.split("/")[2];
+      }
+    }
+
+    return /^[a-zA-Z0-9_-]{11}$/.test(id || "") ? id : null;
+  } catch {
+    return null;
+  }
+}
+
+document.getElementById("load").onclick = () => {
+  const id = getVideoId(link.value.trim());
+
+  if (!id) {
+    alert("Link inválido do YouTube.");
+    return;
+  }
+
+  player.innerHTML = `
+    <iframe
+      src="https://www.youtube-nocookie.com/embed/${id}?rel=0"
+      allow="autoplay; encrypted-media; picture-in-picture; fullscreen"
+      allowfullscreen>
+    </iframe>
+  `;
+
+  state.textContent = "Vídeo carregado — monitoramento ativo";
+  register("Player carregado. Detector aguardando anúncios.");
+};
+
+chromeStatus();
+
+function chromeStatus() {
+  register("Página pronta. A extensão precisa estar instalada e ativa.");
+}
+
+window.addEventListener("message", event => {
+  if (event.source !== window) return;
+  if (event.data?.source !== "retro-auto-skip") return;
+
+  register(event.data.message);
+  state.textContent = event.data.status;
+});
+</script>
+</body>
+</html>
